@@ -4,6 +4,21 @@
 #if PLATFORM_LN882H
 
 #include "hal/hal_adc.h"
+#include "hal/hal_gpio.h"
+
+int pintochannel(int pinNumber) {
+    switch (pinNumber) {
+        case 0 : return ADC_CH2; break;
+        case 1 : return ADC_CH3; break;
+        case 4 : return ADC_CH4; break;
+        case 19: return ADC_CH5; break;
+        case 20: return ADC_CH6; break;
+        case 21: return ADC_CH7; break;
+        case 65: return ADC_CH0; break;
+        default: addLogAdv(LOG_WARN, LOG_FEATURE_DRV, "ADC Invalid Init on pin %i\n", pinNumber);
+                 return -1;
+    }
+}
 
 void HAL_ADC_Init(int pinNumber)
 {

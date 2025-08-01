@@ -540,7 +540,7 @@ void init_lfs(int create){
         // boot overwrite or anything nasty....
         newsize = (newsize/LFS_BLOCK_SIZE)*LFS_BLOCK_SIZE;
         if ((newsize < LFS_BLOCKS_MIN_LEN) || (newsize > LFS_BLOCKS_MAX_LEN)) {
-            ADDLOGF_ERROR("LFSSize OUT OF BOUNDS 0x%X (range 0x%X-0x%X) - defaulting to 0x%X", 
+            ADDLOGF_ERROR("LFSSize OUT OF BOUNDS 0x%X (range 0x%X-0x%X) - defaulting to 0x%X\r\n",
                 newsize,
                 LFS_BLOCKS_MIN_LEN,
                 LFS_BLOCKS_MAX_LEN,
@@ -551,12 +551,12 @@ void init_lfs(int create){
         uint32_t newstart = (LFS_BLOCKS_END - newsize);
 
         if (newstart < LFS_BLOCKS_START_MIN){
-            ADDLOGF_ERROR("LFS OUT OF BOUNDS start 0x%X too small", newstart);
+            ADDLOGF_ERROR("LFS OUT OF BOUNDS start 0x%X too small\r\n", newstart);
             return;
         }
         if ((newstart + newsize > LFS_BLOCKS_END) ||
             (newstart + newsize < LFS_BLOCKS_START_MIN)){
-            ADDLOGF_ERROR("LFS OUT OF BOUNDS end 0x%X too big", newstart + newsize);
+            ADDLOGF_ERROR("LFS OUT OF BOUNDS end 0x%X too big\r\n", newstart + newsize);
             return;
         }
 #endif
@@ -656,25 +656,25 @@ void init_lfs(int create){
         // this should only happen on the first boot
         if (err){
             if (create) {
-                ADDLOGF_INFO("Formatting LFS");
+                ADDLOGF_INFO("Formatting LFS\r\n");
                 err  = lfs_format(&lfs, &cfg);
                 if (err){
-                    ADDLOGF_ERROR("Format LFS failed %d", err);
+                    ADDLOGF_ERROR("Format LFS failed %d\r\n", err);
                     return;
                 }
                 ADDLOGF_INFO("Formatted LFS");
                 err = lfs_mount(&lfs, &cfg);
                 if (err){
-                    ADDLOGF_ERROR("Mount LFS failed %d", err);
+                    ADDLOGF_ERROR("Mount LFS failed %d\r\n", err);
                     return;
                 }
                 lfs_initialised = 1;
             } else {
-                ADDLOGF_INFO("LFS not present - not creating");
+                ADDLOGF_INFO("LFS not present - not creating\r\n");
             }
         } else {
             // mounted existing
-            ADDLOGF_INFO("Mounted existing LFS");
+            ADDLOGF_INFO("Mounted existing LFS\r\n");
             lfs_initialised = 1;
         }
 #ifdef LFS_BOOTCOUNT
@@ -689,7 +689,7 @@ void init_lfs(int create){
 
         // remember the storage is not updated until the file is closed successfully
         lfs_file_close(&lfs, &file);
-        ADDLOGF_INFO("boot count %d", boot_count);
+        ADDLOGF_INFO("boot count %d\r\n", boot_count);
 #endif
     }
 }

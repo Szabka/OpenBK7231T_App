@@ -324,3 +324,8 @@ void TinyIR_NEC_RunFrame();
 void DRV_ESPHome_API_Init();
 void DRV_ESPHome_API_Deinit();
 void DRV_ESPHome_API_OnEverySecond();
+/** NTC driver */
+void DRV_NTC_Init(uint8_t pin);
+void DRV_NTC_OnEverySecond();
+void DRV_NTC_AppendInformationToHTTPIndexPage(http_request_t *request);
+

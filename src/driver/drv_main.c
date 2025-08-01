@@ -1011,6 +1011,13 @@ static driver_t g_drivers[] = {
 	false,                                   // loaded
 	},
 #endif
+#if ENABLE_DRIVER_NTC
+	//drvdetail:{"name":"NTC",
+	//drvdetail:"title":"Temperature measurement on an ADC capable pin",
+	//drvdetail:"descr":"currently 10K NTC with 10K pullup supported",
+	//drvdetail:"requires":"ADC capable pin"}
+	{ "NTC",		DRV_NTC_Init,		DRV_NTC_OnEverySecond,	DRV_NTC_AppendInformationToHTTPIndexPage, NULL, NULL, NULL, false },
+#endif
 #if ENABLE_DRIVER_ADCBUTTON
 	//drvdetail:{"name":"ADCButton",
 	//drvdetail:"title":"TODO",

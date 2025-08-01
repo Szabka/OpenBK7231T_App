@@ -227,14 +227,16 @@ void NTP_SendRequest(bool bBlocking) {
     // Send the message to server:
     if(sendto(g_ntp_socket, &packet, sizeof(packet), 0,
          (struct sockaddr*)&g_address, adrLen) < 0) {
-        addLogAdv(LOG_INFO, LOG_FEATURE_NTP,"NTP_SendRequest: Unable to send message");
+        addLogAdv(LOG_INFO, LOG_FEATURE_NTP,"NTP_SendRequest: Unable to send message %d",errno);
         NTP_Shutdown();
 		// quick next frame attempt
 		if (g_secondsElapsed < 60) {
 			g_ntp_delay = 0;
 		}
         return;
-    }
+    } else {
+		addLogAdv(LOG_INFO, LOG_FEATURE_NTP,"NTP Request sent");
+	}
 
     // https://github.com/tuya/tuya-iotos-embeded-sdk-wifi-ble-bk7231t/blob/5e28e1f9a1a9d88425f3fd4b658e895a8ee7b83b/platforms/bk7231t/tuya_os_adapter/src/system/tuya_hal_network.c
     //
@@ -271,7 +273,11 @@ void NTP_CheckForReceive() {
 #endif
 
     if(recv_len < 0){
-			addLogAdv(LOG_INFO, LOG_FEATURE_NTP,"NTP_CheckForReceive: Error while receiving server's msg");
+		addLogAdv(LOG_INFO, LOG_FEATURE_NTP,"NTP_CheckForReceive: Error while receiving server's msg %d",errno);
+		NTP_Shutdown();
+		if (!g_synced && g_secondsElapsed < 60) {
+			NTP_SendRequest(false); //no response received in the previous second, quickly send new request
+		}
         return;
     }
     highWord = MAKE_WORD(ptr[40], ptr[41]);
@@ -324,7 +330,10 @@ void NTP_SendRequest_BlockingMode() {
 void NTP_OnEverySecond()
 {
 
-    if(Main_IsConnectedToWiFi()==0)
+#if ENABLE_CALENDAR_EVENTS
+	NTP_RunEvents(g_ntpTime, g_synced);
+#endif
+    if(!Main_IsConnectedToWiFi())
     {
         return;
     }

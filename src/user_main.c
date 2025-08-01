@@ -631,7 +631,7 @@ void Main_LogPowerSave() {
 	if (!OBK_Mcu_metrics.task) {
 		OBK_Mcu_metrics.task = "unkn2";
 	}
-	ADDLOGF_DEBUG("PS: %ums/%ums longests:%ums/%ums req:%ums/%ums %s %s",
+	ADDLOGF_DEBUG("PS: %ums/%ums longests:%ums/%ums req:%ums/%ums %s %s\r\n",
 		BK_TICKS_TO_MS(OBK_Mcu_metrics.slept_ticks),
 		BK_TICKS_TO_MS(OBK_Mcu_metrics.sleep_requested_ticks),
 		BK_TICKS_TO_MS(OBK_Mcu_metrics.longest_sleep_1s),
@@ -642,7 +642,7 @@ void Main_LogPowerSave() {
 		OBK_Mcu_metrics.task
 	);
 	// see mcu_ps.c for reasons...
-	ADDLOGF_DEBUG("PS: nosleep reasons %d %d %d %d %d",
+	ADDLOGF_DEBUG("PS: nosleep reasons %d %d %d %d %d\r\n",
 		OBK_Mcu_metrics.reasons[0], // not enabled
 		OBK_Mcu_metrics.reasons[1], // peri_busy
 		OBK_Mcu_metrics.reasons[2], // mcu_prevent
@@ -1267,9 +1267,9 @@ int Main_IsOpenAccessPointMode()
 	return g_bOpenAccessPointMode;
 }
 
-int Main_IsConnectedToWiFi()
-{
-	return g_bHasWiFiConnected;
+// connected and has useable IP
+bool Main_IsConnectedToWiFi() {
+	return g_bHasWiFiConnected>0 && (g_cfg.staticIP.localIPAddr[0] != 0 || g_currentIPString[0] != 0);
 }
 
 
@@ -1509,7 +1509,7 @@ void Main_Init_Before_Delay()
 	if (g_bootFailures > RESTARTS_REQUIRED_FOR_SAFE_MODE)
 	{
 		bSafeMode = 1;
-		ADDLOGF_INFO("###### safe mode activated - boot failures %d", g_bootFailures);
+		ADDLOGF_INFO("###### safe mode activated - boot failures %d\r\n", g_bootFailures);
 	}
 	CFG_InitAndLoad();
 
@@ -1554,11 +1554,11 @@ void Main_Init_Delay()
 void Main_Init_After_Delay()
 {
 	const char* wifi_ssid, * wifi_pass;
-	ADDLOGF_INFO("%s", __func__);
+	ADDLOGF_INFO("%s\r\n", __func__);
 
 	// we can log this after delay.
 	if (bSafeMode) {
-		ADDLOGF_INFO("###### safe mode activated - boot failures %d", g_bootFailures);
+		ADDLOGF_INFO("###### safe mode activated - boot failures %d\r\n", g_bootFailures);
 	}
 #if ALLOW_SSID2
 	Init_WiFiSSIDactual_FromChannelIfSet();//Channel must be set in early.bat using CMD_setStartupSSIDChannel
@@ -1592,12 +1592,13 @@ void Main_Init_After_Delay()
 		else {
 			if (Main_HasFastConnect()) {
 #if ENABLE_MQTT
+				ADDLOGF_INFO("Fast WIFI connect is active.\r\n");
 				mqtt_loopsWithDisconnected = 9999;
 #endif
 				Main_ConnectToWiFiNow();
 			}
 			else {
-				g_connectToWiFi = 5;
+				g_connectToWiFi = 2;
 			}
 		}
 	}
@@ -1651,7 +1652,7 @@ void Main_Init_After_Delay()
 #endif
 	}
 
-	ADDLOGF_INFO("%s done", __func__);
+	ADDLOGF_INFO("%s done\r\n", __func__);
 }
 
 // to be overriden

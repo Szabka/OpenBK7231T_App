@@ -2830,7 +2830,7 @@ int http_fn_ha_cfg(http_request_t* request) {
 					mqttAdded = 1;
 				}
 				if (switchAdded == 0) {
-					poststr(request, "  switch:\n");
+					hprintf255(request, "  switch %s:\n",shortDeviceName);
 					switchAdded = 1;
 				}
 

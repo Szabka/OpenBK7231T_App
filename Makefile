@@ -64,10 +64,11 @@ submodules:
 ifdef GITHUB_ACTIONS
 	@echo Submodules already checked out during setup
 else
-	git submodule update --init --recursive
+	git submodule update --init --recursive --checkout
 endif
 
 update-submodules: submodules
+	@echo no git modifications
 ifdef GITHUB_ACTIONS
 	git config user.name github-actions
 	git config user.email github-actions@github.com

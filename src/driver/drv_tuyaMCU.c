@@ -784,9 +784,13 @@ struct tm* TuyaMCU_Get_NTP_Time() {
 	struct tm* ptm;
 	time_t ntpTime;
 
+	// if not synchronized yet wait up to 2 seconds
+	for (int i=0;!NTP_IsTimeSynced()&&i<40;i++) {
+		rtos_delay_milliseconds(50);
+	}
 	ntpTime=(time_t)TIME_GetCurrentTime();
-	addLogAdv(LOG_INFO, LOG_FEATURE_TUYAMCU, "MCU time to set: %i", ntpTime);
-	ptm = gmtime(&ntpTime);
+	addLogAdv(LOG_INFO, LOG_FEATURE_TUYAMCU, "MCU time to set: %i\n", g_ntpTime);
+	ptm = gmtime(&g_ntpTime);
 	if (ptm != 0) {
 		addLogAdv(LOG_INFO, LOG_FEATURE_TUYAMCU, "ptime ->gmtime => tm_hour: %i", ptm->tm_hour);
 		addLogAdv(LOG_INFO, LOG_FEATURE_TUYAMCU, "ptime ->gmtime => tm_min: %i", ptm->tm_min);

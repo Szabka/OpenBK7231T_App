@@ -1061,7 +1061,7 @@ void PIN_SetPinRoleForPinIndex(int index, int role) {
 
 	if (g_enable_pins) {
 		int falling = 0;
-
+		if (role!=0) addLogAdv(LOG_INFO, LOG_FEATURE_GENERAL, "PIN %i Setup role %i.\r\n",index,role);
 		// init new role
 		switch (role)
 		{

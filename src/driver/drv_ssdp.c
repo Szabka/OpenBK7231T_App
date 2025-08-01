@@ -41,7 +41,7 @@ static void DRV_SSDP_Send_Notify();
 static int ssdp_timercount = 0;
 
 extern const char *HAL_GetMyIPString();
-extern int Main_IsConnectedToWiFi();
+extern bool Main_IsConnectedToWiFi();
 
 
 // allocated at first use, freed if stopped

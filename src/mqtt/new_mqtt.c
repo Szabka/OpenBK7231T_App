@@ -1470,7 +1470,7 @@ OBK_Publish_Result MQTT_ChannelPublish(int channel, int flags)
 	char valueStr[16];
 
 	// allow users to force-hide some channels (those channels are NEVER published)
-	if (CHANNEL_HasNeverPublishFlag(channel)) {
+	if (!MQTT_IsReady() || CHANNEL_HasNeverPublishFlag(channel)) {
 		return OBK_PUBLISH_OK;
 	}
 
