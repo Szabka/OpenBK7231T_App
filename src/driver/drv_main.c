@@ -376,9 +376,9 @@ static driver_t g_drivers[] = {
 	//drvdetail:"requires":""}
 	{ "NTP",                                 // Driver Name
 	NTP_Init,                                // Init
-	NTP_OnEverySecond,                       // onEverySecond
+	NULL,                                    // onEverySecond
 	NTP_AppendInformationToHTTPIndexPage,    // appendInformationToHTTPIndexPage
-	NULL,                                    // runQuickTick
+	NTP_RunQuickTick,                        // runQuickTick
    	NTP_Stop,                                // stopFunction
    	NULL,                                    // onChannelChanged
    	NULL,                                    // onHassDiscovery

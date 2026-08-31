@@ -8,7 +8,7 @@
 */
 void NTP_Init();
 void NTP_Stop();
-void NTP_OnEverySecond();
+void NTP_RunQuickTick();
 // returns number of seconds passed after 1900
 unsigned int NTP_GetCurrentTime();
 unsigned int NTP_GetCurrentTimeWithoutOffset();
@@ -18,7 +18,6 @@ int NTP_GetTimesZoneOfsSeconds();
 void NTP_SetTimesZoneOfsSeconds(int o);
 // for Simulator only, on Windows, for unit testing
 void NTP_SetSimulatedTime(unsigned int timeNow);
-// drv_ntp_events.c
 extern time_t g_ntpTime;
 
 #endif /* __DRV_NTP_H__ */

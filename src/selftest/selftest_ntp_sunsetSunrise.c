@@ -109,7 +109,6 @@ void Test_TIME_SunsetSunrise() {
 		g_secondsElapsed++;
 		// we might have an action pending for this time, so call TIME_OnEverySecond();
 		TIME_OnEverySecond();
-		NTP_OnEverySecond();
 	}
 	SELFTEST_ASSERT_CHANNEL(15, 2020);
 	// now we should be at about 15:26
@@ -140,7 +139,6 @@ void Test_TIME_SunsetSunrise() {
 		g_secondsElapsed++;
 		// we might have an action pending for this time, so call TIME_OnEverySecond();
 		TIME_OnEverySecond();
-		NTP_OnEverySecond();
 	}
 	// channel value should change
 	SELFTEST_ASSERT_CHANNEL(15, 4567);

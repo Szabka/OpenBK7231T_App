@@ -18,6 +18,11 @@
 
 #define LOG_FEATURE LOG_FEATURE_NTP
 
+// QuickTick is 25ms; early = every 4 (~100ms), later = every 40 (~1s)
+#define NTP_QUICK_DIV_EARLY 4
+#define NTP_QUICK_DIV_LATER 40
+#define NTP_EARLY_SECONDS 60
+
 typedef struct
 {
 
@@ -230,7 +235,7 @@ void NTP_SendRequest(bool bBlocking) {
         addLogAdv(LOG_INFO, LOG_FEATURE_NTP,"NTP_SendRequest: Unable to send message %d",errno);
         NTP_Shutdown();
 		// quick next frame attempt
-		if (g_secondsElapsed < 60) {
+		if (g_secondsElapsed < NTP_EARLY_SECONDS) {
 			g_ntp_delay = 0;
 		}
         return;
@@ -273,9 +278,9 @@ void NTP_CheckForReceive() {
 #endif
 
     if(recv_len < 0){
-		addLogAdv(LOG_INFO, LOG_FEATURE_NTP,"NTP_CheckForReceive: Error while receiving server's msg %d",errno);
+		addLogAdv(LOG_INFO, LOG_FEATURE_NTP,"NTP_CheckForReceive: Error while receiving server's msg %d\r\n",errno);
 		NTP_Shutdown();
-		if (!g_synced && g_secondsElapsed < 60) {
+		if (!g_synced && g_secondsElapsed < NTP_EARLY_SECONDS) {
 			NTP_SendRequest(false); //no response received in the previous second, quickly send new request
 		}
         return;
@@ -285,7 +290,7 @@ void NTP_CheckForReceive() {
     // combine the four bytes (two words) into a long integer
     // this is NTP time (seconds since Jan 1 1900):
     secsSince1900 = highWord << 16 | lowWord;
-    addLogAdv(LOG_INFO, LOG_FEATURE_NTP,"Seconds since Jan 1 1900 = %u",secsSince1900);
+    addLogAdv(LOG_INFO, LOG_FEATURE_NTP,"Seconds since Jan 1 1900 = %u\r\n",secsSince1900);
 
 /*
     g_ntpTime = secsSince1900 - NTP_OFFSET;
@@ -293,7 +298,7 @@ void NTP_CheckForReceive() {
 */
    TIME_setDeviceTime((uint32_t) (secsSince1900 - NTP_OFFSET) );
 //    g_ntpTime=(time_t)TIME_GetCurrentTime();
-    addLogAdv(LOG_INFO, LOG_FEATURE_NTP,"Unix time: %u - local Time %s",(uint32_t) (secsSince1900 - NTP_OFFSET),TS2STR(TIME_GetCurrentTime(),TIME_FORMAT_LONG));
+    addLogAdv(LOG_INFO, LOG_FEATURE_NTP,"Unix time: %u - local Time %s\r\n",(uint32_t) (secsSince1900 - NTP_OFFSET),TS2STR(TIME_GetCurrentTime(),TIME_FORMAT_LONG));
 //    ltm = gmtime(&g_ntpTime);
 //    addLogAdv(LOG_INFO, LOG_FEATURE_NTP, LTSTR, LTM2TIME(ltm));
 
@@ -327,12 +332,8 @@ void NTP_SendRequest_BlockingMode() {
 
 }
 
-void NTP_OnEverySecond()
+static void NTP_Tick(void)
 {
-
-#if ENABLE_CALENDAR_EVENTS
-	NTP_RunEvents(g_ntpTime, g_synced);
-#endif
     if(!Main_IsConnectedToWiFi())
     {
         return;
@@ -364,6 +365,18 @@ void NTP_OnEverySecond()
             }
         }
     }
+}
+
+void NTP_RunQuickTick(void)
+{
+	static int acc = 1;
+
+	if (--acc > 0) {
+		return;
+	}
+	NTP_Tick();
+	acc = (!g_synced && g_secondsElapsed < NTP_EARLY_SECONDS)
+		? NTP_QUICK_DIV_EARLY : NTP_QUICK_DIV_LATER;
 }
 
 void NTP_AppendInformationToHTTPIndexPage(http_request_t* request, int bPreState)
